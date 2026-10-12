@@ -1,6 +1,6 @@
 {
   "name": "dsh-prompt-studio",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "提示词工作台：优化、多轮迭代、多模型对比测试",
   "type": "module",
   "main": "lib/index.js",
@@ -51,6 +51,10 @@
   },
   "engines": {
     "node": ">=22.5.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "keywords": [
     "dsh",

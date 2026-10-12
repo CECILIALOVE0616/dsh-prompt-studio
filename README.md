@@ -20,6 +20,16 @@ DSH 插件。在左栏提供一个「提示词」面板，用来优化提示词�
 
 ## 安装
 
+本插件是一个 DSH **profile bundle**，不能靠 `npm install -g` 生效——它必须被装进某个 DSH profile 才会注册面板、工具与路由。
+
+发布到 npm 后，最简单的方式是让 DSH 自己按包名安装：
+
+```bash
+dsh plugin --profile <profile> add dsh-prompt-studio
+```
+
+或者从源码构建出 `.tgz` 再装：
+
 ```bash
 git clone https://github.com/CECILIALOVE0616/dsh-prompt-studio.git
 cd dsh-prompt-studio
