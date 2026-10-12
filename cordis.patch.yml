@@ -1,0 +1,10 @@
+# dsh-prompt-studio bundle patch：把本插件插进 profile 的图层栈。
+# 安装后由 dsh plugin 命令自动并入，不需要手改 profile 文件。
+#
+# 不要再往 agent preset 里加同名行。工具是按名字全局注册的，重复注册会报
+# `tool "prompt_optimize" is already registered in this scope`。
+# 想把工具从某个组合里排除，应该用后面的补丁层按 id 覆盖本行
+# （`- id: dsh-prompt-studio` 配 `disabled: true`），而不是复制一份。
+- insert:
+    - id: dsh-prompt-studio
+      name: 'dsh-prompt-studio'
