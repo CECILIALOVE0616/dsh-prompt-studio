@@ -1,15 +1,16 @@
 # dsh-prompt-studio 提示词工作台
 
-DSH 插件。在左栏提供一个「提示词」面板，用来优化提示词、多轮迭代、多模型对比测试、保存模板与查看历史。
+DSH 插件。在左栏提供一个「提示词」面板，用来优化提示词、多轮迭代、保存模板与查看历史。
 
 对标 Prompt Optimizer 的核心能力，但只做提示词，不含图像工作区、提示词花园、MCP、多消息工作区、变量与函数测试。
 
 ## 它做什么
 
 - **优化**：给一段原始提示词，选一个已配置的模型，拿回一个改写后的提示词。
-- **迭代**：在上一版基础上按方向调整（"更简洁"、"补上输出格式约束"……），形成版本链，可回退到任意一版。
-- **测试对比**：单模型测试、2–4 个模型并排对比、裁判模型分析「原始 vs 优化后」的得失。
-- **模板与历史**：内置模板（结构化扩写 / 精简压缩 / 加输出格式约束 / 角色设定补全），可另存；历史按时间倒序，可筛选、删除、重新载入。
+- **迭代**：在上一版基础上按方向调整（"更简洁"、"补上输出格式约束"……），形成版本链，可回退到任意一版。方向在面板内直接填，回车即开始。
+- **等待有反馈**：优化与迭代期间显示进度条和已等待秒数。
+- **模板与历史**：内置模板（结构化扩写 / 精简压缩 / 加输出格式约束 / 角色设定补全），可另存；历史按时间倒序，可筛选、删除、重新载入（载入后自动切回「优化」页）。「存入历史」把结果那一栏当前的内容存成一条手写版本；「存为模板」才是存成可复用的模板。
+- **在新对话中使用**：优化结果那一栏可以直接手改；改完点「在新对话中使用」，选一个工作区，插件就会新开一个对话、把这段提示词填进输入框并直接发送，省掉复制粘贴。
 - **工具**：agent 可直接调用 `prompt_optimize`。
 
 ## 它不做什么
@@ -40,7 +41,7 @@ npm pack            # 产出 dsh-prompt-studio-<version>.tgz
 
 然后用 DSH 自己的安装入口把这个 tgz 装进目标 profile。两种方式二选一：
 
-- **桌面应用**：用宿主提供的插件安装接口装上该 `.tgz`（本机实测走的是这条路）。
+- **桌面应用**：用宿主提供的插件安装接口装上该 `.tgz`。
 - **CLI**：`dsh plugin --profile <profile> add ./dsh-prompt-studio-<version>.tgz`。
 
 装完重载 DSH，左栏会出现「提示词」入口。
@@ -63,21 +64,20 @@ npm pack            # 产出 dsh-prompt-studio-<version>.tgz
 | `defaultProvider` / `defaultModel` | 空 | 默认模型；留空则用会话当前路由 |
 | `maxTokens` | `4096` | 单次调用的输出上限 |
 | `timeoutMs` | `120000` | 单次调用超时（上限 30 分钟） |
-| `compareMax` | `4` | 对比模式最多勾选几个模型 |
 | `maxPromptChars` | `20000` | 单条提示词长度上限 |
 | `historyLimit` | `200` | 历史列表一次取多少条 |
 | `toolEnabled` | `true` | 是否注册 `prompt_optimize` 工具 |
 
 除 `toolEnabled` 外都支持热更新：改完立刻生效，不用重启。**`toolEnabled` 需要重启 DSH**——它决定工具在启动时注不注册，这类开关不享受热更新。
 
-也可以走环境变量：`DSH_PROMPT_STUDIO_MODE` / `_PROVIDER` / `_MODEL` / `_MAX_TOKENS` / `_TIMEOUT_MS` / `_COMPARE_MAX` / `_TOOL`。优先级是「插件设置 > 环境变量 > 内置默认」。
+也可以走环境变量：`DSH_PROMPT_STUDIO_MODE` / `_PROVIDER` / `_MODEL` / `_MAX_TOKENS` / `_TIMEOUT_MS` / `_TOOL`。优先级是「插件设置 > 环境变量 > 内置默认」。
 
 ## 数据放在哪
 
 每个工作区各自一个 SQLite 库：`<工作区>/.dsh-prompt-studio/prompt-studio.db`。三张表：
 
 - `prompts`：提示词版本（含 `parent_id` 版本链）
-- `runs`：每次模型调用（优化 / 迭代 / 测试 / 分析 / 对比）
+- `runs`：每次模型调用（优化 / 迭代）
 - `templates`：模板（内置 + 自建）
 
 用的是 Node 内置的 `node:sqlite`，不需要额外装数据库。库是按工作区隔离的，换个项目就是另一套历史。
@@ -104,7 +104,7 @@ lib/
   schema.js   schemastery 软导入（解构 {Schema} 会静默拿到 undefined）
   config.js   配置解析（设置 > 环境变量 > 默认），含 volatile cell 解包
   llm.js      对宿主 llm 服务的封装（streamText / listRoutes / assertRoute）
-  prompts.js  提示词工程：优化 / 迭代 / 分析的系统提示词，以及容错解析
+  prompts.js  提示词工程：优化 / 迭代的系统提示词，以及容错清理
   store.js    node:sqlite 存储层
   routes.js   浏览器侧 HTTP API（/dsh-prompt-studio/*）
   tools.js    prompt_optimize 工具定义
