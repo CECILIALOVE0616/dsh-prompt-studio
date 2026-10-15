@@ -1,6 +1,6 @@
 {
   "name": "dsh-prompt-studio",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "提示词工作台：优化、多轮迭代，并可直接在新对话中使用",
   "type": "module",
   "main": "lib/index.js",
